@@ -1,0 +1,94 @@
+#include <math.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+struct students {
+    char id[10];
+    char name[15];
+    char last_name[30];
+    char patronymic[30];
+    char faculty[7];
+    char speciality[100];
+};
+
+const char* getfield(char* line, int num)
+{
+    const char* tok;
+    for (tok = strtok(line, ";");
+         tok && *tok;
+         tok = strtok(NULL, ";\n"))
+    {
+        if (!--num)
+            return tok;
+    }
+    return NULL;
+}
+
+int num_lines(FILE* file_name){
+    int nl = 1;
+    char c = fgetc(file_name);
+    while (c != EOF){
+        if (c == '\n') nl++;
+        c = fgetc(file_name);
+    }
+    rewind(file_name);
+    return nl;
+}
+
+void show_all(struct students *name, FILE* file_name) { //выводит весь список
+
+
+    printf(" --ID-------NAME--------LAST NAME------PATRONYMIC--------F--------------SPECIALITY----------------\n");
+    printf("|------|------------|---------------|---------------|--------|------------------------------------|\n");
+
+    int i = 0;
+
+    while (fscanf(file_name, "%s %s %s %s %s %s", name[i].id, name[i].name, name[i].last_name, name[i].patronymic, name[i].faculty, name[i].speciality) != EOF) {
+        printf(" %-5s| %-11s| %-14s| %-14s| %-7s| %-35s|\n", name[i].id, name[i].name, name[i].last_name, name[i].patronymic, name[i].faculty, name[i].speciality);
+        i++;
+    }
+
+    rewind(file_name);
+};
+
+
+int main() {
+
+    struct students *BMSTU;
+    FILE *db;
+
+    
+    // выделяем память для считываемой структуры
+    BMSTU = (struct students*)malloc(sizeof(struct students));
+
+    db = fopen("students.csv", "r");
+
+    if (db == NULL) { //проверка на открытие файла
+        printf("Не удалось открыть файл");
+        getchar();
+        return 1;
+    } else {
+        printf("Файл успешно открыт\n");
+    }
+
+    int nl = num_lines(db); //колличество строк в файле
+
+    char buffer[1024];
+    fgets(buffer, 1024, db); //переносим данные из файла в буфер
+    for (int i = 0; i < nl; i++) {
+        strcpy(BMSTU[i].id, strtok(buffer, ";"));
+        strcpy(BMSTU[i].name, strtok(NULL, ";"));
+        strcpy(BMSTU[i].last_name, strtok(NULL, ";"));
+        strcpy(BMSTU[i].patronymic, strtok(NULL, ";"));
+        strcpy(BMSTU[i].faculty, strtok(NULL, ";"));
+        strcpy(BMSTU[i].speciality, strtok(NULL, "\n"));
+    }
+
+    fclose(db);
+
+    show_all(BMSTU, db);
+
+
+    return 0;
+}
