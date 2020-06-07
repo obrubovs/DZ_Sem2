@@ -12,29 +12,7 @@ struct students {
     char speciality[100];
 };
 
-const char* getfield(char* line, int num)
-{
-    const char* tok;
-    for (tok = strtok(line, ";");
-         tok && *tok;
-         tok = strtok(NULL, ";\n"))
-    {
-        if (!--num)
-            return tok;
-    }
-    return NULL;
-}
 
-int num_lines(FILE* file_name){
-    int nl = 1;
-    char c = fgetc(file_name);
-    while (c != EOF){
-        if (c == '\n') nl++;
-        c = fgetc(file_name);
-    }
-    rewind(file_name);
-    return nl;
-}
 
 void show_all(struct students *name, FILE* file_name) { //выводит весь список
 
